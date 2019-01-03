@@ -40,6 +40,27 @@ app.post('/borrow', (req, res) => {
     })
 })
 
+app.put('/borrow/:id', (req, res) => {
+    if (req.body.dueDate && req.body.NIU && req.body.borrowDate && req.body.status) {
+        con.query(`UPDATE borrow SET NIU = '${req.body.NIU}', borrowDate = '${req.body.borrowDate}', dueDate = '${req.body.dueDate}', status = '${req.body.status}' WHERE borrowId = '${req.params.id}'`, (err, data) => {
+            if (err) {
+                res.status(400).send({ message: err.sqlMessage })
+            }
+            if (data) {
+                if (data.affectedRows > 0) {
+                    res.status(200).send({ message: "Success" })
+                }
+                else {
+                    res.status(400).send({ message: "Data Not Found!" })
+                }
+            }
+        })
+    }
+    else {
+        res.status(400).send({ messsage: "Please input correct invName, brand and type" })
+    }
+})
+
 app.delete('/borrow/:id', (req, res) => {
     if(req.body.invId){
         con.query(`DELETE FROM borrowdetails WHERE borrowId = '${req.params.id}' AND invId = '${req.body.invId}'`, (err, data) => {
