@@ -4,6 +4,7 @@ var bodyParser = require('body-parser')
 var con = require('./models/db')
 var inventory = require('./controllers/inventory')
 var users = require('./controllers/user')
+var borrow = require('./controllers/borrow')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -26,6 +27,8 @@ app.set('port', (process.env.PORT || 5000))
 app.use(inventory)
 
 app.use(users)
+
+app.use(borrow)
 
 app.listen(app.get('port'), function () {
     console.log("listening on port " + app.get('port') + "...")

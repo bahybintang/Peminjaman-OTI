@@ -5,8 +5,8 @@ var con = require('../models/db')
 app.post('/inventory', async (req, res) => {
     invID(id => {
         console.log(id)
-        if (req.body.invName && req.body.brand && id) {
-            con.query(`INSERT INTO inventory (invName, brand, dateIn, ID, type) values ('${req.body.invName}', '${req.body.brand}', NOW(), '${id}', '${req.body.type}')`, (err, data) => {
+        if (req.body.invName && req.body.brand && id && req.body.type) {
+            con.query(`INSERT INTO inventory (invName, brand, dateIn, invId, type) values ('${req.body.invName}', '${req.body.brand}', NOW(), '${id}', '${req.body.type}')`, (err, data) => {
                 if (err) {
                     res.status(400).send({ message: err.sqlMessage })
                 }
@@ -22,7 +22,7 @@ app.post('/inventory', async (req, res) => {
 })
 
 app.get('/inventory/:id', (req, res) => {
-    con.query(`SELECT * FROM inventory WHERE id = '${req.params.id}'`, (err, data) => {
+    con.query(`SELECT * FROM inventory WHERE invId = '${req.params.id}'`, (err, data) => {
         if (err) {
             res.status(400).send({ message: err.sqlMessage })
         }
@@ -59,7 +59,7 @@ app.get('/inventory/generateid', (req, res) => {
 })
 
 app.delete('/inventory/:id', (req, res) => {
-    con.query(`DELETE FROM inventory WHERE id = '${req.params.id}'`, (err, data) => {
+    con.query(`DELETE FROM inventory WHERE invId = '${req.params.id}'`, (err, data) => {
         if (err) {
             res.status(400).send({ message: err.sqlMessage })
         }
@@ -76,7 +76,7 @@ app.delete('/inventory/:id', (req, res) => {
 
 app.put('/inventory/:id', (req, res) => {
     if (req.body.type && req.body.invName && req.body.brand) {
-        con.query(`UPDATE inventory SET invName = '${req.body.invName}', brand = '${req.body.brand}', type = '${req.body.type}' WHERE id = '${req.params.id}'`, (err, data) => {
+        con.query(`UPDATE inventory SET invName = '${req.body.invName}', brand = '${req.body.brand}', type = '${req.body.type}' WHERE invId = '${req.params.id}'`, (err, data) => {
             if (err) {
                 res.status(400).send({ message: err.sqlMessage })
             }
@@ -96,7 +96,7 @@ app.put('/inventory/:id', (req, res) => {
 })
 
 async function invID(callback) {
-    con.query(`SELECT * FROM inventory ORDER BY id DESC LIMIT 1`, (err, data) => {
+    con.query(`SELECT * FROM inventory ORDER BY invId DESC LIMIT 1`, (err, data) => {
         var date = new Date()
         if (err) {
             throw err;
@@ -106,7 +106,7 @@ async function invID(callback) {
                 var finalData = 'INV' + '-' + (date.getFullYear() % 100) + '' + ('00' + date.getMonth() + 1).slice(-2) + '-' + 1
             }
             else {
-                var number = parseInt(data[0].id.split('-')[2])
+                var number = parseInt(data[0].invId.split('-')[2])
                 number++
                 var finalData = 'INV' + '-' + (date.getFullYear() % 100) + '' + ('00' + date.getMonth() + 1).slice(-2) + '-' + number
             }

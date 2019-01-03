@@ -53,3 +53,19 @@ app.put('/users/:id', (req, res) => {
         res.status(400).send({ messsage: "Please input correct userName" })
     }
 })
+
+app.delete('/users/:id', (req, res) => {
+    con.query(`DELETE FROM users WHERE NIU = '${req.params.id}'`, (err, data) => {
+        if (err) {
+            res.status(400).send({ message: err.sqlMessage })
+        }
+        if (data) {
+            if (data.affectedRows > 0) {
+                res.status(200).send({ message: "Success" })
+            }
+            else {
+                res.status(400).send({ message: "Data Not Found!" })
+            }
+        }
+    })
+})
