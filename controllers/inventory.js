@@ -41,15 +41,27 @@ app.get('/inventory', (req, res) => {
     var invName = req.query.invName ? ("LIKE '%" + req.query.invName + "%'") : "REGEXP '^.*'"
     var brand = req.query.brand ? ("LIKE '%" + req.query.brand + "%'") : "REGEXP '^.*'"
     var type = req.query.type ? ("LIKE '%" + req.query.type + "%'") : "REGEXP '^.*'"
-
-    con.query(`SELECT * FROM inventory WHERE invName ${invName} AND brand ${brand} AND type ${type}`, (err, data) => {
-        if (err) {
-            res.status(400).send({ message: err.sqlMessage })
-        }
-        if (data) {
-            res.send(data)
-        }
-    })
+    
+    if (req.query.available) {
+        con.query(`SELECT inventory.* FROM inventory LEFT OUTER JOIN borrowdetails USING (invId) WHERE borrowdetails.invId IS NULL AND invName ${invName} AND brand ${brand} AND type ${type}`, (err, data) => {
+            if (err) {
+                res.status(400).send({ message: err.sqlMessage })
+            }
+            if (data) {
+                res.send(data)
+            }
+        })
+    }
+    else {
+        con.query(`SELECT * FROM inventory WHERE invName ${invName} AND brand ${brand} AND type ${type}`, (err, data) => {
+            if (err) {
+                res.status(400).send({ message: err.sqlMessage })
+            }
+            if (data) {
+                res.send(data)
+            }
+        })
+    }
 })
 
 app.get('/inventory/generateid', (req, res) => {
